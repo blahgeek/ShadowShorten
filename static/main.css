@@ -70,8 +70,8 @@ a {
   /*color: #babec2;*/
   color: #6a6f75;
   text-align: center;
-  margin-top: 25px;
-  margin-bottom: 30px;
+  margin: 25px auto 30px;
+  max-width: 80%;
 }
 
 .title {

@@ -1,6 +1,0 @@
-[submodule "lua-resty-http"]
-	path = lua-resty-http
-	url = git@github.com:pintsized/lua-resty-http.git
-[submodule "lua-resty-template"]
-	path = lua-resty-template
-	url = https://github.com/bungle/lua-resty-template

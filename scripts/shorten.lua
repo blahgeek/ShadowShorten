@@ -6,7 +6,7 @@
 local random = require "resty.random"
 local http = require "resty.http"
 
-local common = require "common"
+local common = require "ShadowShorten.scripts.include.common"
 
 local gen_random = function(len)
     local digits = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -59,6 +59,11 @@ end
 
 if not string.find(url, "http://") and not string.find(url, "https://") then
     url = "http://" .. url
+end
+
+uri_path = http:parse_uri(url)[4]
+if uri_path == nil or uri_path == "" then
+    url = url .. "/"  -- so that nginx would not pass uri of the original request
 end
 
 blocked = is_block(url)

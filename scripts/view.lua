@@ -4,8 +4,9 @@
 -- @Last Modified time: 2015-05-26
 
 local template = require "resty.template"
-local httpc = require "resty.http"
-local common = require "common"
+local http = require "resty.http"
+
+local common = require "ShadowShorten.scripts.include.common"
 
 local key = ngx.var[1]
 local country = ngx.var.geoip_country_code
@@ -29,7 +30,7 @@ if ngx.var[2] then
     end
 else
     if country == "CN" and res[2] ~= "false" then
-        local parsed = httpc:parse_uri(res[1])
+        local parsed = http:parse_uri(res[1])
         return template.render("proxy.html", {
                                 domain = parsed[2],
                                 url = res[1],
