@@ -61,12 +61,11 @@ if not string.find(url, "http://") and not string.find(url, "https://") then
     url = "http://" .. url
 end
 
-uri_path = http:parse_uri(url)[4]
-if uri_path == nil or uri_path == "" then
-    url = url .. "/"  -- so that nginx would not pass uri of the original request
-end
+local url_scheme, url_host, url_port, url_path = unpack(http:parse_uri(url))
+local url_scheme_host = url_scheme .. "://" .. url_host .. ":" .. tostring(url_port)
+if url_path == nil or url_path == "" then url_path = "/" end
 
-blocked = is_block(url)
+blocked = is_block(url_scheme_host)
 key = gen_random(5)
 
 ----------------------------------------
@@ -75,14 +74,14 @@ key = gen_random(5)
 
 local red = common.new_redis()
 local ok, err = red:hmset("shorten:" .. key, {
-                              url = url,
-                              blocked = tostring(blocked)
+                            host = url_scheme_host,
+                            uri = url_path,
+                            blocked = tostring(blocked)
                           })
 if not ok then
     return common.exit(ngx.HTTP_INTERNAL_SERVER_ERROR, "Failed to insert into redis")
 end
 
-ngx.say(url)
 ngx.say(key)
 
 red:set_keepalive(10000, 10)
