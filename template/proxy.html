@@ -1,9 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="/static/main.css">
+        <title>ShadowShorten</title>
     </head>
     <body>
-        <p>{{ url }} is blocked in China and you're from China </p>
+        <div class="wrapper">
+            <p class="title">ShadowShorten</p>
+            <p class="title small">来自BlahGeek的科学短网址服务</p>
+            <p class="info">你正在使用中国大陆IP前往{{ domain }}，可能导致无法访问<br />
+            你可以选择使用ShadowShorten自带的代理继续访问</p>
+            <a class="btn" href="{* proxy *}">使用代理</a>
+            <a class="btn white-btn" href="{* url *}">直接访问</a>
+        </div>
     </body>
 </html>

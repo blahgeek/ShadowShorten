@@ -4,6 +4,7 @@
 -- @Last Modified time: 2015-05-26
 
 local template = require "resty.template"
+local httpc = require "resty.http"
 local common = require "common"
 
 local key = ngx.var[1]
@@ -28,7 +29,12 @@ if ngx.var[2] then
     end
 else
     if country == "CN" and res[2] ~= "false" then
-        return template.render("proxy.html", {url = res[1]})
+        local parsed = httpc:parse_uri(res[1])
+        return template.render("proxy.html", {
+                                domain = parsed[2],
+                                url = res[1],
+                                proxy = ngx.var.proxy_domain .. "/" .. key .. "/proxy"
+                               })
     else
         return ngx.redirect(res[1])
     end

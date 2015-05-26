@@ -27,7 +27,7 @@ local is_block = function(url)
     -- return: true for blocked, false for not blocked, nil for unknown
     -- url must start with "http://" or "https://"
     local httpc = http.new()
-    local res, err = httpc:request_uri("http://wdetect.blahgeek.com/?" ..
+    local res, err = httpc:request_uri(ngx.var.block_detect .. "/?" ..
                                        "type=gf_this_site&language=en-us&v=3&location=" .. 
                                        ngx.escape_uri(url))
     if not res then
