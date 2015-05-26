@@ -9,8 +9,8 @@ local http = require "resty.http"
 local common = require "ShadowShorten.scripts.include.common"
 
 local gen_random = function(len)
-    local digits = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    local digits_len = 62  -- 10 + 26 * 2
+    local digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+    local digits_len = 36  -- 10 + 26
 
     random_raw_str = random.bytes(len)
     random_str = ''
@@ -66,7 +66,7 @@ local url_scheme_host = url_scheme .. "://" .. url_host .. ":" .. tostring(url_p
 if url_path == nil or url_path == "" then url_path = "/" end
 
 blocked = is_block(url_scheme_host)
-key = gen_random(5)
+key = gen_random(8)
 
 ----------------------------------------
 -- Insert it into redis

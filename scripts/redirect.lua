@@ -23,7 +23,7 @@ if country == "CN" and blocked ~= "false" then
     return template.render("proxy.html", {
                domain = host,
                url = host .. uri,
-               proxy = key .. "." .. ngx.var.proxy_domain .. "/" .. uri
+               proxy = ngx.var.proxy_schema .. "://" .. key .. ngx.var.proxy_domain .. uri
            })
 else
     return ngx.redirect(host .. uri)

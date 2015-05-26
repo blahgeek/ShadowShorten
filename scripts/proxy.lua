@@ -4,7 +4,10 @@
 -- @Last Modified time: 2015-05-26
 
 local common = require "ShadowShorten.scripts.include.common"
-local key = string.gsub(ngx.var.host, ngx.var.proxy_domain, "")
+
+local _host = ngx.var.host
+local _host_pos = string.find(_host, ".", 1, true)
+local key = string.sub(_host, 1, _host_pos - 1)
 local red = common.new_redis()
 
 local res, err = red:hmget("shorten:" .. key, "host", "uri", "blocked")
