@@ -5,13 +5,8 @@
 
 local random = require "resty.random"
 local http = require "resty.http"
-local redis = require "resty.redis"
 
-local exit = function(msg, status)
-    ngx.status = status
-    ngx.say(msg)
-    return ngx.exit(status)
-end
+local common = require "common"
 
 local gen_random = function(len)
     local digits = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -59,7 +54,7 @@ url = nil
 if args then url = args["url"] end
 
 if not url then
-    return exit("Faied to get url", ngx.HTTP_BAD_REQUEST)
+    return common.exit(ngx.HTTP_BAD_REQUEST)
 end
 
 if not string.find(url, "http://") and not string.find(url, "https://") then
@@ -73,23 +68,16 @@ key = gen_random(5)
 -- Insert it into redis
 ----------------------------------------
 
-local red = redis:new()
-red:set_timeout(1000)
-local ok, err = red:connect("127.0.0.1", 6379)
-if not ok then
-    return exit("Failed to connect to redis", ngx.HTTP_INTERNAL_SERVER_ERROR)
-end
-
+local red = common.new_redis()
 local ok, err = red:hmset("shorten:" .. key, {
                               url = url,
                               blocked = tostring(blocked)
                           })
 if not ok then
-    return exit("Failed to insert into redis", ngx.HTTP_INTERNAL_SERVER_ERROR)
+    return common.exit(ngx.HTTP_INTERNAL_SERVER_ERROR, "Failed to insert into redis")
 end
 
 ngx.say(url)
-ngx.say(blocked)
 ngx.say(key)
 
 red:set_keepalive(10000, 10)
