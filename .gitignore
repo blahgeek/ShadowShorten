@@ -46,3 +46,4 @@ luac.out
 *.hex
 
 logs/
+auth.htpasswd
