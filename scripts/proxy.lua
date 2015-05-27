@@ -5,9 +5,7 @@
 
 local common = require "ShadowShorten.scripts.include.common"
 
-local _host = ngx.var.host
-local _host_pos = string.find(_host, ".", 1, true)
-local key = string.sub(_host, 1, _host_pos - 1)
+local key = ngx.var.key;
 local red = common.new_redis()
 
 local res, err = red:hmget("shorten:" .. key, "host", "uri", "blocked")
@@ -21,6 +19,6 @@ red:set_keepalive(10000, 10)
 if blocked == "false" then -- only forbidden if not blocked
     return common.exit(ngx.HTTP_FORBIDDEN)
 else
-    ngx.var.proxy_path = host
+    ngx.var.custom_proxy_host = host
     return
 end
