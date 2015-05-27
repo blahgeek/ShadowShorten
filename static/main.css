@@ -7,7 +7,11 @@ body {
   margin: 0;
 }
 a {
-  text-decoration: none;
+  text-decoration: inherit;
+  color: inherit;
+}
+a:hover {
+  text-decoration: underline;
 }
 .wrapper {
   margin: 65px auto 10px;
