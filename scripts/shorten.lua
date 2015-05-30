@@ -1,7 +1,7 @@
 -- @Author: BlahGeek
 -- @Date:   2015-05-26
 -- @Last Modified by:   BlahGeek
--- @Last Modified time: 2015-05-26
+-- @Last Modified time: 2015-05-30
 
 local random = require "resty.random"
 local http = require "resty.http"
@@ -9,14 +9,14 @@ local http = require "resty.http"
 local common = require "ShadowShorten.scripts.include.common"
 
 local gen_random = function(len)
-    local digits = "0123456789abcdefghijklmnopqrstuvwxyz"
-    local digits_len = 36  -- 10 + 26
+    local DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz"
+    local DIGITS_LEN = 36  -- 10 + 26
 
-    random_raw_str = random.bytes(len)
-    random_str = ''
+    local random_raw_str = random.bytes(len)
+    local random_str = ''
     for i = 1, len do
-        code = string.byte(random_raw_str, i)
-        code = code % digits_len + 1
+        local code = string.byte(random_raw_str, i)
+        code = code % DIGITS_LEN + 1
         random_str = random_str .. string.sub(digits, code, code)
     end
 
@@ -27,20 +27,17 @@ local is_block = function(url)
     -- return: true for blocked, false for not blocked, nil for unknown
     -- url must start with "http://" or "https://"
     local httpc = http.new()
-    local res, err = httpc:request_uri(ngx.var.block_detect .. "/?" ..
-                                       "type=gf_this_site&language=en-us&v=3&location=" .. 
-                                       ngx.escape_uri(url))
-    if not res then
-        return nil
-    end
+    local req_url = string.format("%s/?type=gf_this_site&language=en-us&v=3&location=%s",
+                                  ngx.var.block_detect, ngx.escape_uri(url))
+    local res, err = httpc:request_uri(req_url)
+    if not res then return nil end
 
-    blocked = nil
     if string.find(res.body, "is not blocked in China") then
-        blocked = false
+        local blocked = false
     elseif string.find(res.body, "% blocked in China") then
-        blocked = true
+        local blocked = true
     end
-    return blocked
+    return blocked -- maybe nil
 end
 
 -----------------------------------------
@@ -50,12 +47,10 @@ end
 ngx.req.read_body()
 local args, err = ngx.req.get_post_args()
 
-url = nil
-if args then url = args["url"] end
+local url = args and args["url"]
+if not url then return common.exit(ngx.HTTP_BAD_REQUEST) end
 
-if not url then
-    return common.exit(ngx.HTTP_BAD_REQUEST)
-end
+local ttl = args and args["ttl"]
 
 if not string.find(url, "http://") and not string.find(url, "https://") then
     url = "http://" .. url
@@ -65,8 +60,8 @@ local url_scheme, url_host, url_port, url_path = unpack(http:parse_uri(url))
 local url_scheme_host = url_scheme .. "://" .. url_host .. ":" .. tostring(url_port)
 if url_path == nil or url_path == "" then url_path = "/" end
 
-blocked = is_block(url_scheme_host)
-key = gen_random(8)
+local blocked = is_block(url_scheme_host)
+local key = gen_random(tonumber(ngx.var.random_key_len))
 
 ----------------------------------------
 -- Insert it into redis
@@ -81,6 +76,8 @@ local ok, err = red:hmset("shorten:" .. key, {
 if not ok then
     return common.exit(ngx.HTTP_INTERNAL_SERVER_ERROR, "Failed to insert into redis")
 end
+
+if ttl then red:expire("shorten" .. key, ttl) end
 
 ngx.say(key)
 
