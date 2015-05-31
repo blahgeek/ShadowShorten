@@ -17,7 +17,7 @@ local gen_random = function(len)
     for i = 1, len do
         local code = string.byte(random_raw_str, i)
         code = code % DIGITS_LEN + 1
-        random_str = random_str .. string.sub(digits, code, code)
+        random_str = random_str .. string.sub(DIGITS, code, code)
     end
 
     return random_str
@@ -32,10 +32,11 @@ local is_block = function(url)
     local res, err = httpc:request_uri(req_url)
     if not res then return nil end
 
+    local blocked = nil
     if string.find(res.body, "is not blocked in China") then
-        local blocked = false
+        blocked = false
     elseif string.find(res.body, "% blocked in China") then
-        local blocked = true
+        blocked = true
     end
     return blocked -- maybe nil
 end
@@ -58,6 +59,9 @@ end
 
 local url_scheme, url_host, url_port, url_path = unpack(http:parse_uri(url))
 local url_scheme_host = url_scheme .. "://" .. url_host .. ":" .. tostring(url_port)
+if (url_port == 80 and url_scheme == "http") or (url_port == 443 and url_sceme == "https") then
+    url_scheme_host = url_scheme .. "://" .. url_host
+end
 if url_path == nil or url_path == "" then url_path = "/" end
 
 local blocked = is_block(url_scheme_host)
