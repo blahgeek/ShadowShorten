@@ -6,7 +6,7 @@
 
 [中文介绍](http://blog.blahgeek.com/ShadowShorten/)
 
-[Demo](http://blaa.cf/mavucc00) (Visit it from chinese, otherwise it's just a shorten URL, nothing more)
+[Demo](http://blaa.cf/4djtgp6c) (Visit it from chinese, otherwise it's just a shorten URL, nothing more)
 
 ## How it works
 
